@@ -1,6 +1,7 @@
 #include "polynomes/operation.h"
 #include <stdio.h>
 #include "stdbool.h"
+#include <stdlib.h>
 void creerTerme(Terme *t, double coef, int exp)
 {
     t->coefficient = coef;
@@ -11,29 +12,90 @@ void initialiser_polynome(Polynome *p)
 {
     p->tete = NULL;
 }
+void supprimer(Terme **tete, int exp)
+{
+    Terme *courant = *tete;
+    Terme *prec = NULL;
+
+    while (courant != NULL && courant->exposant != exp)
+    {
+        prec = courant;
+        courant = courant->suivant;
+    }
+    if (courant == NULL)
+    {
+        return;
+    }
+    if (prec == NULL)
+    {
+        *tete = courant->suivant;
+    }
+    else
+    {
+        prec->suivant = courant->suivant;
+    }
+    free(courant);
+}
 bool polynomeVide(Polynome p)
 {
     return p.tete == NULL;
 }
-void ajouterTerme(Polynome *p, Terme *t) //ne pas toucher a cette fonction car c'est une fonction sensible
+void ajouterTerme(Polynome *p, Terme *t)
 {
-    if (t == NULL)
+    if (p == NULL || t == NULL)
     {
-        printf("votre Terme est Null");
         return;
     }
-    if (p->tete == NULL ||
-        t->exposant > p->tete->exposant)
+    if (t->coefficient == 0)
+    {
+        free(t);
+        return;
+    }
+    if (p->tete == NULL)
+    {
+        p->tete = t;
+        return;
+    }
+    if (p->tete->exposant == t->exposant)
+    {
+        Terme *existant = p->tete;
+
+        existant->coefficient += t->coefficient;
+        free(t);
+        if (existant->coefficient == 0)
+        {
+            p->tete = existant->suivant;
+            free(existant);
+        }
+        return;
+    }
+    if (t->exposant > p->tete->exposant)
     {
         t->suivant = p->tete;
         p->tete = t;
         return;
     }
     Terme *courant = p->tete;
+
     while (courant->suivant != NULL &&
            courant->suivant->exposant > t->exposant)
     {
         courant = courant->suivant;
+    }
+    if (courant->suivant != NULL &&
+        courant->suivant->exposant == t->exposant)
+    {
+        Terme *existant = courant->suivant;
+
+        existant->coefficient += t->coefficient;
+        free(t);
+        if (existant->coefficient == 0)
+        {
+            courant->suivant = existant->suivant;
+            free(existant);
+        }
+
+        return;
     }
     t->suivant = courant->suivant;
     courant->suivant = t;
@@ -59,53 +121,5 @@ void afficherPolynome(Polynome p)
 }
 Polynome *additionner_polynomes(Polynome *p1, Polynome *p2)
 {
+    
 }
-
-
-
-
-
-
-
-
-
-// ce code est genere âr chatgpt pour regler l'erreur d'insertion 
-// en cas du meme exposant
-/*
-void ajouterTerme(Polynome *p, Terme *t)
-{
-    if (p == NULL || t == NULL)
-        return;
-
-    t->suivant = NULL;
-
-    Terme **courant = &p->tete;
-
-    // Chercher la position d'insertion
-    while (*courant != NULL &&
-           (*courant)->exposant > t->exposant)
-    {
-        courant = &(*courant)->suivant;
-    }
-
-    // Exposant identique : additionner les coefficients
-    if (*courant != NULL &&
-        (*courant)->exposant == t->exposant)
-    {
-        (*courant)->coefficient += t->coefficient;
-
-        if ((*courant)->coefficient == 0)
-        {
-            Terme *temp = *courant;
-            *courant = temp->suivant;
-            free(temp);
-        }
-
-        free(t);
-        return;
-    }
-
-    // Insertion du nouveau terme
-    t->suivant = *courant;
-    *courant = t;
-}*/
