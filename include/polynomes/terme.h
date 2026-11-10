@@ -1,10 +1,13 @@
 #ifndef TERME_H
 #define TERME_H
 
-typedef struct Terme {
-    double coefficient;  // coefficient le nombre du polnome
-    int exposant; //exposant
-    struct Terme* suivant;  // liste chaine pointant vers le prochain terme
-}Terme;
+typedef struct Terme
+{
+    double coefficient;    // coefficient le nombre du polnome
+    int exposant;          // exposant
+    struct Terme *suivant; // liste chaine pointant vers le prochain terme
+} Terme;
+
+void creerTerme(Terme *t, double coef, int exp);
 
 #endif
