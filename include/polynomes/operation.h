@@ -5,7 +5,8 @@
 #define OPERATION_H
 
 void creerTerme(Terme *t, double coef, int exp);
-void initialiser_polynome(Polynome *p);
+void initialiser_polynome(Polynome* p);
+void supprimer(Terme **tete, int exp);
 bool polynomeVide(Polynome p);
 void ajouterTerme(Polynome *p, Terme *t);
 void supprimerTerme(Polynome *p, Terme *t);

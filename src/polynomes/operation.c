@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "stdbool.h"
+#include <stdlib.h>
 void creerTerme(Terme *t, double coef, int exp)
 {
     t->coefficient = coef;
@@ -16,6 +18,30 @@ void initialiser_polynome(Polynome *p)
     p->tete = NULL;
 }
 
+void supprimer(Terme **tete, int exp)
+{
+    Terme *courant = *tete;
+    Terme *prec = NULL;
+
+    while (courant != NULL && courant->exposant != exp)
+    {
+        prec = courant;
+        courant = courant->suivant;
+    }
+    if (courant == NULL)
+    {
+        return;
+    }
+    if (prec == NULL)
+    {
+        *tete = courant->suivant;
+    }
+    else
+    {
+        prec->suivant = courant->suivant;
+    }
+    free(courant);
+}
 bool polynomeVide(Polynome p)
 {
     return p.tete == NULL;
@@ -32,12 +58,40 @@ void ajouterTerme(Polynome *p, Terme *t) // ne pas toucher a cette fonction car 
     {
         printf("coefficient est null\n");
         free(t);
+void ajouterTerme(Polynome *p, Terme *t)
+{
+    if (p == NULL || t == NULL)
+    {
+        return;
+    }
+    if (t->coefficient == 0)
+    {
+        free(t);
+        return;
+    }
+    if (p->tete == NULL)
+    {
+        p->tete = t;
+        return;
+    }
+    if (p->tete->exposant == t->exposant)
+    {
+        Terme *existant = p->tete;
+
+        existant->coefficient += t->coefficient;
+        free(t);
+        if (existant->coefficient == 0)
+        {
+            p->tete = existant->suivant;
+            free(existant);
+        }
         return;
     }
 
     printf("ajout du terme : %gX^%d\n", t->coefficient, t->exposant);
 
     if (p->tete == NULL || t->exposant > p->tete->exposant)
+    if (t->exposant > p->tete->exposant)
     {
         t->suivant = p->tete;
         p->tete = t;
@@ -60,6 +114,7 @@ void ajouterTerme(Polynome *p, Terme *t) // ne pas toucher a cette fonction car 
     }
 
     Terme *courant = p->tete;
+
     while (courant->suivant != NULL &&
            courant->suivant->exposant > t->exposant)
     {
@@ -79,6 +134,21 @@ void ajouterTerme(Polynome *p, Terme *t) // ne pas toucher a cette fonction car 
         return;
     }
 
+    if (courant->suivant != NULL &&
+        courant->suivant->exposant == t->exposant)
+    {
+        Terme *existant = courant->suivant;
+
+        existant->coefficient += t->coefficient;
+        free(t);
+        if (existant->coefficient == 0)
+        {
+            courant->suivant = existant->suivant;
+            free(existant);
+        }
+
+        return;
+    }
     t->suivant = courant->suivant;
     courant->suivant = t;
 }
@@ -250,3 +320,5 @@ void ajouterTerme(Polynome *p, Terme *t)
     t->suivant = *courant;
     *courant = t;
 }*/
+    
+}
